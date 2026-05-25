@@ -102,6 +102,10 @@ SUPABASE_SERVICE_ROLE_KEY=        # server-only, never imported in client compon
 - Use `proxy.ts` (Next 16), never `middleware.ts`. Session refresh only; no data fetching in the proxy.
 - Any function marked `"use cache"` must take all cache-key inputs (e.g. `userId`) as explicit arguments — never read `cookies()`/`headers()`/`auth` inside it. Invalidate via `revalidateTag` in mutation paths.
 
+## Git
+
+- Never include Claude as a co-author in commit messages.
+
 ## Conventions
 
 - **Routing:** App Router with route groups `(auth)` and `(app)`. Server Components by default; add `"use client"` only when needed (forms, streaming hooks).
