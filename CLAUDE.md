@@ -2,6 +2,14 @@
 
 A Next.js app where a user pastes text, picks a mode (improve / email / linkedin / technical / casual / translate), and receives a streamed AI response.
 
+## Context Files
+
+## Read the following to get the full context of the project:
+
+- @context/coding-standards.md
+- @context/ai-interaction.md
+- @context/current-feature.md
+
 ## Stack
 
 - **Framework:** Next.js 16 (App Router) + TypeScript + React 19
@@ -57,9 +65,9 @@ proxy.ts                          (Next 16) Refresh Supabase session on every re
 
 Next 16 ships an explicit, opt-in cache. We use it as follows:
 
-- **Default is uncached.** Add `"use cache"` only to functions/components whose output is safe to share across users *or* is keyed on the user id.
+- **Default is uncached.** Add `"use cache"` only to functions/components whose output is safe to share across users _or_ is keyed on the user id.
 - Cache the **history list** page data fetcher with `"use cache"` + `cacheTag(\`history:${userId}\`)` so we can invalidate precisely after a new generation is saved.
-- Call `revalidateTag(\`history:${userId}\`)` inside the `onFinish` handler of `/api/generate` after inserting the new row.
+- Call `revalidateTag(\`history:${userId}\`)`inside the`onFinish`handler of`/api/generate` after inserting the new row.
 - Use `cacheLife("hours")` (or a named profile) for the history fetcher; never cache the streaming generate route.
 - **Never** wrap anything that reads `cookies()`, `headers()`, or `auth.uid()` directly inside a `"use cache"` function — pass the user id in as an argument so the cache key is explicit.
 - Prompts in `lib/prompts.ts` are pure data — they don't need `"use cache"`.
