@@ -2,7 +2,7 @@
 
 ## Status
 
-Not started — Session 2, task 2 of 4.
+Not started — Session 2, task 3 of 4.
 
 ## Goals
 
@@ -22,3 +22,4 @@ TBD — next task in Session 2.
 - Installed `supabase` CLI as a pnpm devDependency (v2.101.0); ran `supabase init` (scaffolded `supabase/config.toml`) and mirrored schema into `supabase/migrations/20260526000000_init_schema.sql` for `supabase db push`
 - Linked to hosted project `yujdftphgdymerltgruo`; applied migration via `supabase db push`; generated `lib/db/types.ts` via `supabase gen types typescript --linked` (contains `generations` and `usage_daily` Row/Insert/Update types)
 - Installed `ai`, `@ai-sdk/anthropic`, and `server-only`; created `lib/anthropic.ts` exporting `MODEL_ID = "claude-sonnet-4-6"` and a configured `anthropic` provider, guarded by `import "server-only"` so it cannot leak into client bundles; typecheck passes
+- Created `lib/prompts.ts` with `Mode` string-literal union and `PROMPTS: Record<Mode, string>`; 6 modes (improve/email/linkedin/technical/casual/translate) each with a detailed system prompt covering role, task, concrete guidance, and output format; pure data module, no server-only code; typecheck passes
