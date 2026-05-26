@@ -2,7 +2,7 @@
 
 ## Status
 
-Not started — Session 2, task 3 of 4.
+Done — Session 2, task 3 of 4.
 
 ## Goals
 
@@ -23,3 +23,4 @@ TBD — next task in Session 2.
 - Linked to hosted project `yujdftphgdymerltgruo`; applied migration via `supabase db push`; generated `lib/db/types.ts` via `supabase gen types typescript --linked` (contains `generations` and `usage_daily` Row/Insert/Update types)
 - Installed `ai`, `@ai-sdk/anthropic`, and `server-only`; created `lib/anthropic.ts` exporting `MODEL_ID = "claude-sonnet-4-6"` and a configured `anthropic` provider, guarded by `import "server-only"` so it cannot leak into client bundles; typecheck passes
 - Created `lib/prompts.ts` with `Mode` string-literal union and `PROMPTS: Record<Mode, string>`; 6 modes (improve/email/linkedin/technical/casual/translate) each with a detailed system prompt covering role, task, concrete guidance, and output format; pure data module, no server-only code; typecheck passes
+- Created `lib/rate-limit.ts` with `DAILY_LIMIT = 5`, `checkRateLimit(userId)` returning `{ ok, count, limit }` for `429` mapping, and `incrementUsage(userId)` doing read-then-upsert on `usage_daily` with `onConflict: "user_id,day"`; "today" computed as UTC `YYYY-MM-DD`; guarded by `import "server-only"`; typecheck passes
