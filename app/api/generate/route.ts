@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { anthropic, MODEL_ID } from "@/lib/anthropic";
 import { PROMPTS } from "@/lib/prompts";
 import { checkRateLimit, incrementUsage } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser } from "@/lib/supabase/server";
 import { generateSchema } from "@/lib/validation/generate";
 
 function errorResponse(message: string, status: number) {
@@ -13,10 +13,7 @@ function errorResponse(message: string, status: number) {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthenticatedUser();
 
   if (!user) return errorResponse("Unauthorized", 401);
 
