@@ -1,8 +1,9 @@
 "use client";
 
-import { startTransition, useActionState } from "react";
+import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,10 @@ export default function SignupForm() {
     undefined,
   );
 
+  useEffect(() => {
+    if (state && "error" in state) toast.error(state.error);
+  }, [state]);
+
   if (state && "emailSent" in state) {
     return (
       <div className="rounded-md border p-4 text-sm text-center space-y-1">
@@ -46,8 +51,10 @@ export default function SignupForm() {
 
   const onValid = (data: SignUpInput) => {
     const fd = new FormData();
+
     fd.set("email", data.email);
     fd.set("password", data.password);
+    
     startTransition(() => formAction(fd));
   };
 
@@ -84,9 +91,6 @@ export default function SignupForm() {
             </FormItem>
           )}
         />
-        {state && "error" in state && (
-          <p className="text-sm text-destructive">{state.error}</p>
-        )}
         <Button type="submit" className="w-full" disabled={pending}>
           {pending ? "Creating account…" : "Create account"}
         </Button>

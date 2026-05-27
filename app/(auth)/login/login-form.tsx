@@ -1,8 +1,9 @@
 "use client";
 
-import { startTransition, useActionState } from "react";
+import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,10 @@ export default function LoginForm() {
     signIn,
     undefined,
   );
+
+  useEffect(() => {
+    if (state?.error) toast.error(state.error);
+  }, [state]);
 
   const onValid = (data: SignInInput) => {
     const fd = new FormData();
@@ -75,9 +80,6 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        {state?.error && (
-          <p className="text-sm text-destructive">{state.error}</p>
-        )}
         <Button type="submit" className="w-full" disabled={pending}>
           {pending ? "Signing in…" : "Sign in"}
         </Button>
