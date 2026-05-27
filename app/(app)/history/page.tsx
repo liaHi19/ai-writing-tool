@@ -1,11 +1,12 @@
-import { Suspense } from "react";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
+import { Suspense } from "react";
 
-import { fetchGenerationsByUserId } from "@/lib/supabase/server-admin";
-import { createClient } from "@/lib/supabase/server";
 import { CopyButton } from "@/components/editor/CopyButton";
 import type { Tables } from "@/lib/db/types";
+import { formatDate, truncate } from "@/lib/helpers";
+import { getAuthenticatedUser } from "@/lib/supabase/server";
+import { fetchGenerationsByUserId } from "@/lib/supabase/server-admin";
 
 type Generation = Tables<"generations">;
 
@@ -20,28 +21,10 @@ async function fetchHistory(userId: string): Promise<Generation[]> {
   return fetchGenerationsByUserId(userId);
 }
 
-function truncate(text: string, maxLen: number): string {
-  const flat = text.replace(/\s+/g, " ").trim();
-  return flat.length <= maxLen ? flat : flat.slice(0, maxLen) + "…";
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 // Dynamic — reads auth cookies. Lives inside <Suspense> so the static shell
 // can prerender under cacheComponents.
 async function HistoryList() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getAuthenticatedUser();
 
   if (!user) return null;
 
@@ -67,10 +50,7 @@ async function HistoryList() {
             <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium capitalize text-zinc-800">
               {gen.mode}
             </span>
-            <time
-              dateTime={gen.created_at}
-              className="text-xs text-zinc-400"
-            >
+            <time dateTime={gen.created_at} className="text-xs text-zinc-400">
               {formatDate(gen.created_at)}
             </time>
           </div>
@@ -79,9 +59,7 @@ async function HistoryList() {
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
               Input
             </p>
-            <p className="text-sm text-zinc-700">
-              {truncate(gen.input, 220)}
-            </p>
+            <p className="text-sm text-zinc-700">{truncate(gen.input, 220)}</p>
           </div>
 
           <div className="mt-2 space-y-1">
@@ -91,9 +69,7 @@ async function HistoryList() {
               </p>
               <CopyButton text={gen.output} />
             </div>
-            <p className="text-sm text-zinc-700">
-              {truncate(gen.output, 220)}
-            </p>
+            <p className="text-sm text-zinc-700">{truncate(gen.output, 220)}</p>
           </div>
         </li>
       ))}
