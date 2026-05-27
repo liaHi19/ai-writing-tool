@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { fetchGenerationsByUserId } from "@/lib/supabase/server-admin";
 import { createClient } from "@/lib/supabase/server";
+import { CopyButton } from "@/components/editor/CopyButton";
 import type { Tables } from "@/lib/db/types";
 
 type Generation = Tables<"generations">;
@@ -84,9 +85,12 @@ async function HistoryList() {
           </div>
 
           <div className="mt-2 space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-              Output
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                Output
+              </p>
+              <CopyButton text={gen.output} />
+            </div>
             <p className="text-sm text-zinc-700">
               {truncate(gen.output, 220)}
             </p>

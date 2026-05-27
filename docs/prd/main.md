@@ -27,6 +27,7 @@ A Next.js 16 web app where a signed-in user pastes text, picks one of 6 modes, a
 ## 3. Decomposition into 4 sessions
 
 ### Session 1 — Foundation & Auth
+
 - Bootstrap Next 16 + TypeScript + Tailwind + shadcn/ui.
 - Create Supabase project; populate `.env.local`.
 - `lib/supabase/{server,client,proxy}.ts` SSR-aware clients.
@@ -35,26 +36,30 @@ A Next.js 16 web app where a signed-in user pastes text, picks one of 6 modes, a
 - `lib/db/schema.sql`: `generations`, `usage_daily`, RLS policies. Generate types via `supabase gen types`.
 
 ### Session 2 — Generate API & Streaming
+
 - `lib/anthropic.ts` exporting the pinned model id and SDK client.
 - `lib/prompts.ts` exporting `Mode` union and `PROMPTS: Record<Mode, string>` for all 5 modes.
 - `lib/rate-limit.ts` reading/incrementing `usage_daily`.
 - `app/api/generate/route.ts`: authenticate → validate `mode` against enum → check rate limit → `streamText` → on `onFinish` insert row into `generations`, increment `usage_daily`, call `revalidateTag(\`history:${userId}\`)`. Returns `result.toDataStreamResponse()`. Never buffers.
 
 ### Session 3 — Editor UI
+
 - `(app)/page.tsx` main editor screen.
 - `components/editor/{InputArea,ModeSelector,OutputPane,CopyButton}.tsx`.
 - Client uses `useCompletion` against `/api/generate`; tokens render live into `OutputPane`.
 - Errors surface as `sonner` toasts; Generate button disabled mid-stream.
 
 ### Session 4 — History & Polish
+
 - `(app)/history/page.tsx` server component.
-- Cached fetcher: `"use cache"` + `cacheTag(\`history:${userId}\`)` + `cacheLife("hours")`; `userId` passed as explicit argument (no `cookies()`/`auth` inside).
+- Cached fetcher: `"use cache"` + `cacheTag(\`history:${userId}\`)`+`cacheLife("hours")`; `userId`passed as explicit argument (no`cookies()`/`auth` inside).
 - Row UI: mode badge, timestamp, output preview, copy button. Empty state.
 - Final pass: `pnpm lint`, `pnpm typecheck`, `pnpm build`. Manual smoke through all 5 modes + signed-out redirect.
 
 ## 4. Acceptance criteria
 
 ### Session 1
+
 - A new user can sign up, log in, and log out; session survives a full page reload.
 - Visiting any `(app)` route while signed-out redirects to `/login`.
 - `proxy.ts` exists with a `proxy` export and a `config.matcher`; `middleware.ts` does not exist.
@@ -62,6 +67,7 @@ A Next.js 16 web app where a signed-in user pastes text, picks one of 6 modes, a
 - RLS verified: user A cannot `select` user B's rows in `generations` or `usage_daily`.
 
 ### Session 2
+
 - `POST /api/generate` with `{ text, mode }` streams tokens for each of the 6 modes.
 - Unknown `mode` → `400`. Unauthenticated → `401`. Over daily quota → `429`.
 - After stream completes, a `generations` row exists for the user with `output` populated and the correct `mode`; `usage_daily.count` for today is incremented by exactly 1.
@@ -69,6 +75,7 @@ A Next.js 16 web app where a signed-in user pastes text, picks one of 6 modes, a
 - Response is streamed — the route never `await`s the full completion before returning.
 
 ### Session 3
+
 - User can paste text, pick any of the 6 modes, click Generate, and see tokens stream in.
 - Copy button copies the full output to the clipboard.
 - Errors from `/api/generate` (400/401/429/500) appear as toasts with a readable message.
@@ -76,8 +83,6 @@ A Next.js 16 web app where a signed-in user pastes text, picks one of 6 modes, a
 - `pnpm build` succeeds with zero TS or lint errors.
 
 ### Session 4
+
 - `/history` lists the signed-in user's generations newest-first; user A never sees user B's rows.
-- After generating a new output, navigating to `/history` shows the new row (tag invalidated via `revalidateTag` in `onFinish`).
-- History fetcher is annotated with `"use cache"` and takes `userId` as an explicit argument.
-- `pnpm typecheck`, `pnpm lint`, and `pnpm build` all pass green.
 - Manual smoke confirms all 5 modes return non-empty, on-topic output and are persisted to history.
