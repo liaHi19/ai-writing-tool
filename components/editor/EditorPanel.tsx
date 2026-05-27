@@ -17,6 +17,8 @@ export function EditorPanel() {
 
   const { completion, isLoading, complete } = useCompletion({
     api: "/api/generate",
+    // Route returns a plain text stream (toTextStreamResponse); match that here.
+    streamProtocol: "text",
     // The route expects { text, mode }; useCompletion sends { prompt, ...body }.
     // We intercept here to rename prompt → text before the request goes out.
     fetch: async (url, init) => {
