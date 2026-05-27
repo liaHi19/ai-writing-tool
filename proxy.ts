@@ -5,7 +5,7 @@ export async function proxy(request: NextRequest) {
   const { response, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
 
-  const isAppRoute = pathname.startsWith("/app") || pathname === "/";
+  const isAppRoute = pathname === "/" || pathname.startsWith("/history");
   const isAuthRoute = pathname === "/login" || pathname === "/signup";
 
   if (!user && isAppRoute) {
