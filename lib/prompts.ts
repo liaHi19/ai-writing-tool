@@ -1,4 +1,5 @@
-export const MODES = ["improve", "email", "linkedin", "technical", "casual"] as const;
+import { MODES } from "./constants";
+
 export type Mode = (typeof MODES)[number];
 
 const OUTPUT_RULE =

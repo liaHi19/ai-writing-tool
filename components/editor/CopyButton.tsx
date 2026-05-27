@@ -11,9 +11,7 @@ interface CopyButtonProps {
 
 export function CopyButton({ text, disabled }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
-
-  // Reset the "copied" indicator after 2 s; cleanup cancels the timer on unmount
-  // so we never call setCopied on a component that is no longer in the tree.
+  
   useEffect(() => {
     if (!copied) return;
     const timer = setTimeout(() => setCopied(false), 2000);

@@ -7,15 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MODES, type Mode } from "@/lib/prompts";
-
-const MODE_LABELS: Record<Mode, string> = {
-  improve: "Improve",
-  email: "Email",
-  linkedin: "LinkedIn",
-  technical: "Technical",
-  casual: "Casual",
-};
+import { MODE_LABELS, MODES } from "@/lib/constants";
+import { type Mode } from "@/lib/prompts";
 
 interface ModeSelectorProps {
   value: Mode;

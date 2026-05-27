@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MODES } from "@/lib/prompts";
+import { MODES } from "../constants";
 
 export const generateSchema = z.object({
   text: z.string().trim().min(10, "Text must be at least 10 characters"),
