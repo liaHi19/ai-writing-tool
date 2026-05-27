@@ -3,16 +3,13 @@ import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { anthropic, MODEL_ID } from "@/lib/anthropic";
-import { PROMPTS, type Mode } from "@/lib/prompts";
+import { PROMPTS } from "@/lib/prompts";
 import { checkRateLimit, incrementUsage } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
+import { generateSchema } from "@/lib/validation/generate";
 
 function errorResponse(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
-}
-
-function isMode(value: unknown): value is Mode {
-  return typeof value === "string" && value in PROMPTS;
 }
 
 export async function POST(request: Request) {
@@ -30,14 +27,14 @@ export async function POST(request: Request) {
     return errorResponse("Invalid JSON body", 400);
   }
 
-  const { text, mode } = (body ?? {}) as { text?: unknown; mode?: unknown };
-
-  if (typeof text !== "string" || text.length === 0) {
-    return errorResponse("Missing or invalid `text`", 400);
+  const parsed = generateSchema.safeParse(body);
+  if (!parsed.success) {
+    return errorResponse(
+      parsed.error.issues[0]?.message ?? "Invalid request",
+      400,
+    );
   }
-  if (!isMode(mode)) {
-    return errorResponse("Unknown mode", 400);
-  }
+  const { text, mode } = parsed.data;
 
   const rate = await checkRateLimit(user.id);
   if (!rate.ok) {

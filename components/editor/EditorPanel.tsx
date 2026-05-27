@@ -1,19 +1,34 @@
 "use client";
 
-import { useState } from "react";
 import { useCompletion } from "@ai-sdk/react";
+import { useForm, useWatch } from "react-hook-form";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { type Mode } from "@/lib/prompts";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  generateDefaults,
+  generateSchema,
+  type GenerateInput,
+} from "@/lib/validation/generate";
 import { CopyButton } from "./CopyButton";
 import { InputArea } from "./InputArea";
 import { ModeSelector } from "./ModeSelector";
 import { OutputPane } from "./OutputPane";
 
 export function EditorPanel() {
-  const [inputText, setInputText] = useState("");
-  const [mode, setMode] = useState<Mode>("improve");
+  const form = useForm<GenerateInput>({
+    resolver: standardSchemaResolver(generateSchema),
+    defaultValues: generateDefaults,
+    mode: "onTouched",
+  });
 
   const { completion, isLoading, complete } = useCompletion({
     api: "/api/generate",
@@ -40,11 +55,13 @@ export function EditorPanel() {
     onError: (err) => toast.error(err.message),
   });
 
-  const handleGenerate = () => {
-    if (!inputText.trim() || isLoading) return;
-    // Pass mode as extra body so it arrives alongside the prompt in the route
-    complete(inputText, { body: { mode } });
+  const onValid = (data: GenerateInput) => {
+    if (isLoading) return;
+    complete(data.text, { body: { mode: data.mode } });
   };
+
+  const text = useWatch({ control: form.control, name: "text" });
+  const canSubmit = !isLoading && text.trim().length >= 10;
 
   return (
     <div className="min-h-screen bg-zinc-50 p-6">
@@ -56,17 +73,47 @@ export function EditorPanel() {
           </p>
         </div>
 
-        <InputArea value={inputText} onChange={setInputText} disabled={isLoading} />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="text"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <InputArea
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="flex items-center gap-3">
-          <ModeSelector value={mode} onChange={setMode} disabled={isLoading} />
-          <Button
-            onClick={handleGenerate}
-            disabled={isLoading || !inputText.trim()}
-          >
-            {isLoading ? "Generating…" : "Generate"}
-          </Button>
-        </div>
+            <div className="flex items-center gap-3">
+              <FormField
+                control={form.control}
+                name="mode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <ModeSelector
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={!canSubmit}>
+                {isLoading ? "Generating…" : "Generate"}
+              </Button>
+            </div>
+          </form>
+        </Form>
 
         <div className="space-y-2">
           <OutputPane content={completion} isLoading={isLoading} />

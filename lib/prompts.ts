@@ -1,4 +1,5 @@
-export type Mode = "improve" | "email" | "linkedin" | "technical" | "casual";
+export const MODES = ["improve", "email", "linkedin", "technical", "casual"] as const;
+export type Mode = (typeof MODES)[number];
 
 const OUTPUT_RULE =
   "Return only the rewritten text. No preamble, no explanation, no surrounding quotation marks.";

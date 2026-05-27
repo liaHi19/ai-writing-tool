@@ -1,12 +1,32 @@
 "use client";
 
-import { useActionState } from "react";
+import { startTransition, useActionState } from "react";
+import { useForm } from "react-hook-form";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { signUp, type SignUpState } from "@/actions/auth";
+import {
+  authDefaults,
+  signUpSchema,
+  type SignUpInput,
+} from "@/lib/validation/auth";
 
 export default function SignupForm() {
+  const form = useForm<SignUpInput>({
+    resolver: standardSchemaResolver(signUpSchema),
+    defaultValues: authDefaults,
+    mode: "onTouched",
+  });
   const [state, formAction, pending] = useActionState<SignUpState, FormData>(
     signUp,
     undefined,
@@ -24,35 +44,53 @@ export default function SignupForm() {
     );
   }
 
+  const onValid = (data: SignUpInput) => {
+    const fd = new FormData();
+    fd.set("email", data.email);
+    fd.set("password", data.password);
+    startTransition(() => formAction(fd));
+  };
+
   return (
-    <form action={formAction} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
+        <FormField
+          control={form.control}
           name="email"
-          type="email"
-          autoComplete="email"
-          required
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" autoComplete="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
+        <FormField
+          control={form.control}
           name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={6}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      {state && "error" in state && (
-        <p className="text-sm text-destructive">{state.error}</p>
-      )}
-      <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "Creating account…" : "Create account"}
-      </Button>
-    </form>
+        {state && "error" in state && (
+          <p className="text-sm text-destructive">{state.error}</p>
+        )}
+        <Button type="submit" className="w-full" disabled={pending}>
+          {pending ? "Creating account…" : "Create account"}
+        </Button>
+      </form>
+    </Form>
   );
 }

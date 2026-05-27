@@ -7,9 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type Mode, PROMPTS } from "@/lib/prompts";
+import { MODES, type Mode } from "@/lib/prompts";
 
-// Human-readable labels for each mode; derived from the Mode union — not a separate source of truth
 const MODE_LABELS: Record<Mode, string> = {
   improve: "Improve",
   email: "Email",
@@ -17,9 +16,6 @@ const MODE_LABELS: Record<Mode, string> = {
   technical: "Technical",
   casual: "Casual",
 };
-
-// The set of valid mode values, derived from PROMPTS keys (single source of truth)
-const MODES = Object.keys(PROMPTS) as Mode[];
 
 interface ModeSelectorProps {
   value: Mode;
