@@ -1,84 +1,57 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
+import { signUp, type SignUpState } from "@/actions/auth";
 
 export default function SignupForm() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [emailSent, setEmailSent] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [state, formAction, pending] = useActionState<SignUpState, FormData>(
+    signUp,
+    undefined,
+  );
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({ email, password });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
-
-    // If session is null, email confirmation is required
-    if (!data.session) {
-      setEmailSent(true);
-      setLoading(false);
-      return;
-    }
-
-    router.push("/");
-    router.refresh();
-  }
-
-  if (emailSent) {
+  if (state && "emailSent" in state) {
     return (
       <div className="rounded-md border p-4 text-sm text-center space-y-1">
         <p className="font-medium">Check your email</p>
         <p className="text-muted-foreground">
-          We sent a confirmation link to <span className="font-medium">{email}</span>.
+          We sent a confirmation link to{" "}
+          <span className="font-medium">{state.email}</span>.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form action={formAction} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
+          name="email"
           type="email"
           autoComplete="email"
           required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
         />
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <Input
           id="password"
+          name="password"
           type="password"
           autoComplete="new-password"
           required
           minLength={6}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Creating account…" : "Create account"}
+      {state && "error" in state && (
+        <p className="text-sm text-destructive">{state.error}</p>
+      )}
+      <Button type="submit" className="w-full" disabled={pending}>
+        {pending ? "Creating account…" : "Create account"}
       </Button>
     </form>
   );
