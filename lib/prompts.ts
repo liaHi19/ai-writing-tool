@@ -1,4 +1,4 @@
-export type Mode = "improve" | "email" | "linkedin" | "technical" | "casual" | "translate";
+export type Mode = "improve" | "email" | "linkedin" | "technical" | "casual";
 
 const OUTPUT_RULE =
   "Return only the rewritten text. No preamble, no explanation, no surrounding quotation marks.";
@@ -64,20 +64,6 @@ Aim for:
 - Warmth without being silly — no slang, no exclamation-mark spam, no emojis unless the source uses them
 
 Keep the original meaning and roughly the same length. Do not strip important details just to sound breezy.
-
-${OUTPUT_RULE}`,
-
-  translate: `You are a professional translator. Translate the provided text into the target language.
-
-Determining the target language:
-- If the text begins with "Translate to <language>:" (or "to <language>:"), use that language and exclude the directive from the output.
-- Otherwise, if the source is English, translate to Spanish. If the source is any other language, translate to English.
-
-Translation principles:
-- Preserve meaning, register (formal vs. informal), and tone
-- Preserve formatting: paragraphs, lists, line breaks, markdown, and code blocks
-- Do not translate proper nouns, code, identifiers, or technical terms that conventionally stay in the source language
-- Use natural phrasing in the target language, not word-for-word substitution
 
 ${OUTPUT_RULE}`,
 };

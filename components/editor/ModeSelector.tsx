@@ -16,7 +16,6 @@ const MODE_LABELS: Record<Mode, string> = {
   linkedin: "LinkedIn",
   technical: "Technical",
   casual: "Casual",
-  translate: "Translate",
 };
 
 // The set of valid mode values, derived from PROMPTS keys (single source of truth)

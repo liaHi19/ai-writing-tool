@@ -1,6 +1,6 @@
 # AI Writing Tool
 
-A Next.js app where a user pastes text, picks a mode (improve / email / linkedin / technical / casual / translate), and receives a streamed AI response.
+A Next.js app where a user pastes text, picks a mode (improve / email / linkedin / technical / casual), and receives a streamed AI response.
 
 ## Context Files
 
@@ -36,7 +36,7 @@ components/
   editor/                         InputArea, ModeSelector, OutputPane, CopyButton
 lib/
   anthropic.ts                    Vercel AI SDK client + model id constant
-  prompts.ts                      System prompt per mode (improve/email/linkedin/technical/casual/translate)
+  prompts.ts                      System prompt per mode (improve/email/linkedin/technical/casual)
   supabase/
     server.ts, client.ts, proxy.ts   SSR-aware Supabase clients
   rate-limit.ts                   Per-user daily quota check against Postgres
