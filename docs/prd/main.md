@@ -24,7 +24,7 @@ A Next.js 16 web app where a signed-in user pastes text, picks one of 6 modes, a
 - No email/notifications beyond Supabase auth defaults; no custom password-reset flow.
 - No streaming-cancel UI in v1 (request just runs to completion).
 
-## 3. Decomposition into 4 sessions
+## 3. Decomposition into 5 sessions
 
 ### Session 1 — Foundation & Auth
 
@@ -56,6 +56,47 @@ A Next.js 16 web app where a signed-in user pastes text, picks one of 6 modes, a
 - Row UI: mode badge, timestamp, output preview, copy button. Empty state.
 - Final pass: `pnpm lint`, `pnpm typecheck`, `pnpm build`. Manual smoke through all 5 modes + signed-out redirect.
 
+### Session 5 — Design pass & history mutations
+
+Source design: `AI Writing Tool.html` (Polish prototype, exported from claude.ai/design).
+
+**Visual system (fixed, no theme switcher):**
+
+- Cool-fog palette — `bg:#eef1f4`, `surface:#f8fafc`, `surface-2:#e6ebf1`, `border:#d4dbe3`, `fg:#161a1f`, `fg-muted:#6b7280`, `fg-dim:#9aa2ad`.
+- Accent `#2563eb` (accent-fg `#f8fafc`).
+- Corner radius `17px` (small `9px`).
+- Geist (sans) + Geist Mono — already wired in `app/layout.tsx`. Mono is reserved for labels, counters, timestamps, and stat values.
+- Bento 12-col grid wrapping the editor and a `auto-fill minmax(320px,1fr)` grid for history.
+
+**Editor (`/`) — rebuild as bento:**
+
+- Header: brand mark "P" + "Polish · writing v0.4" on the left, segmented Write/History tab nav in the middle (with entry-count pill on History), user email + sign-out on the right. Active tab driven by `usePathname()`.
+- Mode card (span 7): 5 bento buttons, each showing `0N` index + name + one-line description. Active state = dark fill, accent dot.
+- Stats card (span 5): words / chars / read time, live-updating via `useWatch` on the RHF `text` field.
+- Draft card (span 12): minimal textarea (no inner border), counter bar + `<chars> / 2,400`, "⌘+Enter to rewrite" hint, Clear ghost button + primary "Rewrite as <Mode>" CTA. Counter turns accent past ~88% fill.
+- Output card (span 12): empty-state pulse dot + label, Copy and Save buttons in the head, foot meta `<chars> · <words>` + mode name.
+- ⌘/Ctrl + Enter shortcut bound at the panel level triggers Rewrite when input ≥ 10 chars.
+- New `text` cap: `max(2400)` added to `lib/validation/generate.ts` (matches client clamp).
+
+**History (`/history`) — bento card grid:**
+
+- Toolbar: search input, filter chips (All + 5 modes, each with count), Clear-all action.
+- Card: mode badge (accent dot + name), absolute date + relative time stacked top-right, full output body (`-webkit-line-clamp:7`), foot with char/word count + Copy button, hover-revealed trash icon top-right for per-row delete.
+- Search + filtering are client-side over the cached server-fetched list.
+
+**New server actions (`actions/generations.ts`):**
+
+- `deleteGeneration(id)` — authenticates, deletes scoped by `user_id` (defence-in-depth on top of RLS), calls `revalidateTag(\`history:${user.id}\`)`.
+- `clearAllGenerations()` — same auth + revalidation; returns deleted count for toast.
+
+**Auth pages restyle:**
+
+- `/login` and `/signup` adopt the cool-fog ground and Geist typography, with a single bento card (17 px radius) wrapping the form. Brand mark + "Polish" wordmark above the card. Server actions and Zod validation unchanged.
+
+**Bug fix:** `app/api/generate/route.ts` calls `revalidateTag(\`history:${userId}\`, "hours")` with an unsupported second argument — drop it.
+
+**Out of scope:** the design's Tweaks panel (live theme customizer). Defaults from `TWEAK_DEFAULTS` are baked in (`cool` / `#2563eb` / `17px` / Geist).
+
 ## 4. Acceptance criteria
 
 ### Session 1
@@ -86,3 +127,22 @@ A Next.js 16 web app where a signed-in user pastes text, picks one of 6 modes, a
 
 - `/history` lists the signed-in user's generations newest-first; user A never sees user B's rows.
 - Manual smoke confirms all 5 modes return non-empty, on-topic output and are persisted to history.
+
+### Session 5
+
+- `/` renders the bento layout on the cool-fog ground: mode card (5 buttons), stats card, draft card with counter bar, output card with empty-state pulse.
+- Active mode button has the dark fill + accent dot treatment; clicking another mode updates the RHF `mode` field and the primary CTA label.
+- Stats card updates words/chars/read-time live as the user types.
+- Input is capped at 2,400 chars (client clamp + Zod `.max(2400)`); counter goes accent past ~88% fill; Rewrite button is disabled below 10 chars.
+- ⌘/Ctrl + Enter from anywhere on the page triggers Rewrite when valid.
+- Output card's **Save** action downloads a `.txt` file named `polish-<mode>-<timestamp>.txt`; **Copy** confirms via toast.
+- Header shows brand mark + Polish wordmark, segmented Write/History nav (active driven by `usePathname()`, entry-count pill on History), user email + sign-out on the right.
+- `/history` shows bento cards with mode badge (accent dot), absolute date + relative time, full output (clamped to 7 lines), foot meta + Copy button, hover-reveal trash icon top-right.
+- Search input + filter chips narrow the visible cards client-side; chip counts reflect unfiltered totals.
+- Per-card trash → row deleted via `deleteGeneration(id)` server action; `revalidateTag(\`history:${user.id}\`)` invalidates the cache and the card disappears.
+- Clear-all → confirm dialog → `clearAllGenerations()` removes all rows for the user; empty state appears; entry-count pill on the Header tab decrements/disappears accordingly.
+- A second user cannot delete another user's row by passing their `id` (RLS + `.eq("user_id", …)` clause both enforce this).
+- `/login` and `/signup` render with the Polish bento card on cool-fog bg; Zod errors still surface inline; sign-in/sign-up flows unchanged.
+- `app/api/generate/route.ts` no longer passes a second argument to `revalidateTag`.
+- `pnpm lint`, `pnpm typecheck`, `pnpm build` all return zero errors.
+- `SUPABASE_SERVICE_ROLE_KEY` and `ANTHROPIC_API_KEY` remain absent from any client bundle after the restyle.
