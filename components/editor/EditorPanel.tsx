@@ -22,6 +22,7 @@ import { CopyButton } from "./CopyButton";
 import { InputArea } from "./InputArea";
 import { ModeCard } from "./ModeCard";
 import { OutputPane } from "./OutputPane";
+import { StatsCard } from "./StatsCard";
 
 export function EditorPanel() {
   const form = useForm<GenerateInput>({
@@ -88,8 +89,10 @@ export function EditorPanel() {
                 />
               </div>
 
-              {/* Stats — col-span-5, todo 21 */}
-              <div className="col-span-5" />
+              {/* Stats — col-span-5 */}
+              <div className="col-span-5">
+                <StatsCard control={form.control} />
+              </div>
 
               {/* Draft — col-span-12, todo 22 */}
               <div className="col-span-12">
