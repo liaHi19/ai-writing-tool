@@ -1,11 +1,11 @@
 "use client";
 
+import { useCallback, useEffect } from "react";
 import { useCompletion } from "@ai-sdk/react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -19,7 +19,7 @@ import {
   type GenerateInput,
 } from "@/lib/validation/generate";
 import { CopyButton } from "./CopyButton";
-import { InputArea } from "./InputArea";
+import { DraftCard } from "./DraftCard";
 import { ModeCard } from "./ModeCard";
 import { OutputPane } from "./OutputPane";
 import { StatsCard } from "./StatsCard";
@@ -56,13 +56,24 @@ export function EditorPanel() {
     onError: (err) => toast.error(err.message),
   });
 
-  const onValid = (data: GenerateInput) => {
-    if (isLoading) return;
-    complete(data.text, { body: { mode: data.mode } });
-  };
+  const onValid = useCallback(
+    (data: GenerateInput) => {
+      if (isLoading) return;
+      complete(data.text, { body: { mode: data.mode } });
+    },
+    [isLoading, complete],
+  );
 
-  const text = useWatch({ control: form.control, name: "text" });
-  const canSubmit = !isLoading && text.trim().length >= 10;
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        form.handleSubmit(onValid)();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [form, onValid]);
 
   return (
     <div className="min-h-screen bg-(--bg) p-6">
@@ -94,7 +105,7 @@ export function EditorPanel() {
                 <StatsCard control={form.control} />
               </div>
 
-              {/* Draft — col-span-12, todo 22 */}
+              {/* Draft — col-span-12 */}
               <div className="col-span-12">
                 <FormField
                   control={form.control}
@@ -102,10 +113,16 @@ export function EditorPanel() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <InputArea
+                        <DraftCard
                           value={field.value}
                           onChange={field.onChange}
-                          disabled={isLoading}
+                          control={form.control}
+                          onClear={() =>
+                            form.setValue("text", "", {
+                              shouldValidate: true,
+                            })
+                          }
+                          isLoading={isLoading}
                         />
                       </FormControl>
                       <FormMessage />
@@ -121,12 +138,6 @@ export function EditorPanel() {
                   <CopyButton text={completion} disabled={!completion} />
                 </div>
               </div>
-            </div>
-
-            <div className="flex justify-end">
-              <Button type="submit" disabled={!canSubmit}>
-                {isLoading ? "Generating…" : "Generate"}
-              </Button>
             </div>
           </form>
         </Form>

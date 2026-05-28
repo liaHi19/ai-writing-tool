@@ -2,7 +2,11 @@ import { z } from "zod";
 import { MODES } from "../constants";
 
 export const generateSchema = z.object({
-  text: z.string().trim().min(10, "Text must be at least 10 characters"),
+  text: z
+    .string()
+    .trim()
+    .min(10, "Text must be at least 10 characters")
+    .max(2400, "Text cannot exceed 2,400 characters"),
   mode: z.enum(MODES),
 });
 
