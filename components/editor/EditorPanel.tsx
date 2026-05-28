@@ -20,7 +20,7 @@ import {
 } from "@/lib/validation/generate";
 import { CopyButton } from "./CopyButton";
 import { InputArea } from "./InputArea";
-import { ModeSelector } from "./ModeSelector";
+import { ModeCard } from "./ModeCard";
 import { OutputPane } from "./OutputPane";
 
 export function EditorPanel() {
@@ -64,63 +64,69 @@ export function EditorPanel() {
   const canSubmit = !isLoading && text.trim().length >= 10;
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-6">
-      <div className="mx-auto max-w-3xl space-y-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">AI Writing Tool</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Paste your text, pick a mode, and generate.
-          </p>
-        </div>
-
+    <div className="min-h-screen bg-(--bg) p-6">
+      <div className="mx-auto max-w-6xl">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="text"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <InputArea
-                      value={field.value}
-                      onChange={field.onChange}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-12 gap-4">
+              {/* Mode selector — col-span-7 */}
+              <div className="col-span-7">
+                <FormField
+                  control={form.control}
+                  name="mode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <ModeCard
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            <div className="flex items-center gap-3">
-              <FormField
-                control={form.control}
-                name="mode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <ModeSelector
-                        value={field.value}
-                        onChange={field.onChange}
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              {/* Stats — col-span-5, todo 21 */}
+              <div className="col-span-5" />
+
+              {/* Draft — col-span-12, todo 22 */}
+              <div className="col-span-12">
+                <FormField
+                  control={form.control}
+                  name="text"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <InputArea
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Output — col-span-12, todo 23 */}
+              <div className="col-span-12 space-y-2">
+                <OutputPane content={completion} isLoading={isLoading} />
+                <div className="flex justify-end">
+                  <CopyButton text={completion} disabled={!completion} />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
               <Button type="submit" disabled={!canSubmit}>
                 {isLoading ? "Generating…" : "Generate"}
               </Button>
             </div>
           </form>
         </Form>
-
-        <div className="space-y-2">
-          <OutputPane content={completion} isLoading={isLoading} />
-          <div className="flex justify-end">
-            <CopyButton text={completion} disabled={!completion} />
-          </div>
-        </div>
       </div>
     </div>
   );

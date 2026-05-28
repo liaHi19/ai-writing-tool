@@ -8,6 +8,8 @@
 
 ## History
 
+- Session 12 — Bento grid shell + ModeCard: added `MODE_META: Record<Mode, { name: string; description: string }>` to `lib/constants.ts`; created `components/editor/ModeCard.tsx` (`"use client"`) — five bento buttons each showing a `0N` mono index, mode name, and one-line description; active state `bg-(--fg)` / `text-(--accent-fg)` with 8px accent dot top-right, inactive state `bg-(--surface)` / `border-border`; replaced flat `EditorPanel` layout with `grid grid-cols-12 gap-4` — `ModeCard` at col-span-7, Stats placeholder at col-span-5 (todo 21), Draft at col-span-12 (todo 22), Output at col-span-12 (todo 23); `ModeCard` bound to RHF `mode` field via `<FormField>`; deleted `ModeSelector.tsx`; `pnpm build` zero errors
+
 - Session 1 — Project setup: Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui; Supabase project + `.env.local`; `@supabase/ssr` clients; root `proxy.ts` (session refresh + auth redirects); login + signup pages
 - Session 2 — DB schema (`generations`, `usage_daily`, RLS policies); migration via `supabase db push`; generated `lib/db/types.ts`; `lib/anthropic.ts`, `lib/prompts.ts` (5 modes), `lib/rate-limit.ts`; `/api/generate` streaming route with auth, rate-limit, persist in `onFinish`, `revalidateTag`
 - Session 3 — Editor UI: `InputArea`, `ModeSelector`, `OutputPane`, `CopyButton` components; `EditorPanel` with `useCompletion`; `app/(app)/page.tsx`; `sonner` toasts
