@@ -1,20 +1,8 @@
-import type { Tables } from "@/lib/db/types";
 import { formatDate, truncate } from "@/lib/helpers";
+import { fetchHistory } from "@/lib/history";
 import { getAuthenticatedUser } from "@/lib/supabase/server";
-import { fetchGenerationsByUserId } from "@/lib/supabase/server-admin";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { CopyButton } from "../editor/CopyButton";
-
-type Generation = Tables<"generations">;
-
-async function fetchHistory(userId: string): Promise<Generation[]> {
-  "use cache";
-  cacheTag(`history:${userId}`);
-  cacheLife("hours");
-
-  return fetchGenerationsByUserId(userId);
-}
 
 export async function HistoryList() {
   const { user } = await getAuthenticatedUser();

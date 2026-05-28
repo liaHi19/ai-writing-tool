@@ -1,32 +1,37 @@
-import Link from "next/link";
-import { Suspense } from "react";
-import { SignOutButton } from "../auth/SignOutButton";
-import { UserEmail } from "./UserEmail";
+import { getInitials } from "@/lib/helpers";
+import { fetchHistory } from "@/lib/history";
+import { getAuthenticatedUser } from "@/lib/supabase/server";
+import { HeaderNav } from "./HeaderNav";
 
-export function Header() {
+export async function Header() {
+  const { user } = await getAuthenticatedUser();
+
+  const localPart = user?.email?.split("@")[0] ?? "user";
+  const initials = getInitials(localPart);
+  const count = user ? (await fetchHistory(user.id)).length : 0;
+
   return (
-    <header className="border-b bg-white">
-      <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">
-        <nav className="flex gap-6 text-sm font-medium">
-          <Link
-            href="/"
-            className="text-zinc-700 transition-colors hover:text-zinc-900"
-          >
-            Editor
-          </Link>
-          <Link
-            href="/history"
-            className="text-zinc-700 transition-colors hover:text-zinc-900"
-          >
-            History
-          </Link>
-        </nav>
+    <header className="px-8 pt-6">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 mb-7">
         <div className="flex items-center gap-3">
-          <Suspense fallback={null}>
-            <UserEmail />
-          </Suspense>
-          <SignOutButton />
+          <div className="size-7 flex items-center justify-center font-mono font-medium text-[14px] tracking-[-0.02em] bg-(--fg) text-(--bg) rounded-sm">
+            P
+          </div>
+          <div className="flex flex-col leading-none gap-0.75">
+            <span className="text-[17px] font-medium tracking-[-0.01em] text-(--fg)">
+              Polish
+            </span>
+            <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-(--fg-muted)">
+              WRITING
+            </span>
+          </div>
         </div>
+
+        <HeaderNav
+          count={count}
+          userLocalPart={localPart}
+          initials={initials}
+        />
       </div>
     </header>
   );

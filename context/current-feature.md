@@ -2,6 +2,10 @@
 
 ## Status
 
+## Goals
+
+## Notes
+
 ## History
 
 - Session 1 — Project setup: Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui; Supabase project + `.env.local`; `@supabase/ssr` clients; root `proxy.ts` (session refresh + auth redirects); login + signup pages
@@ -14,3 +18,4 @@
 - Session 8 — Zod + React Hook Form validation: `lib/prompts.ts` exports `MODES as const`; `lib/validation/auth.ts` (`signInSchema`, `signUpSchema` — min 8 chars + letter + digit; `authDefaults`); `lib/validation/generate.ts` (`generateSchema` — min 10 chars; `generateDefaults`); `actions/auth.ts` validates FormData with `safeParse` before Supabase; `/api/generate` replaces `isMode()` with `generateSchema.safeParse`; all three client forms (`login-form`, `signup-form`, `EditorPanel`) use `useForm` + `standardSchemaResolver` + shadcn `Form`/`FormField`/`FormMessage`; `components/ui/form.tsx` added (canonical shadcn pattern, `@radix-ui/react-slot`); `docs/todos/16-zod-react-hook-form-validation.md` added
 - Session 9 — Import Polish prototype: `Polish - AI Writing Tool.html` placed at repo root; standalone design export from claude.ai/design; `TWEAK_DEFAULTS` noted — palette `cool`, accent `#2563eb`, radius `17px`, font Geist; Tweaks panel out of scope (tokens baked in, not user-adjustable); `docs/todos/17-import-polish-prototype.md` added
 - Session 10 — Cool-fog design tokens: replaced default OKLch shadcn palette in `app/globals.css` with cool-fog hex tokens (`--bg`, `--surface`, `--surface-2`, `--fg`, `--fg-muted`, `--fg-dim`, `--accent #2563eb`, `--accent-fg`); `--radius: 17px`, `--radius-sm: 9px`; shadcn tokens remapped to cool-fog vars; `.dark` block removed; fixed `--font-sans` to reference `--font-geist-sans`; `pnpm build` zero errors
+- Session 11 — Header restyle: updated `globals.css` to Polish prototype warm tokens (`--bg #f4f1ec`, `--accent #c2410c`, `--radius 18px`, etc.); extracted `fetchHistory` to `lib/history.ts` (shared cached fetcher, `cacheTag history:userId`); updated `HistoryList.tsx` to import from there; created `components/layout/HeaderNav.tsx` (`"use client"`) — segmented pill tabs with inline SVG icons + `HEADER_ICONS` map, entry-count pill on History, `.header-meta` string, user chip with initials avatar, sign-out icon button; rewrote `components/layout/Header.tsx` (server) — 3-column grid `1fr auto 1fr`, brand mark + two-line wordmark left, passes count/user props to `HeaderNav` fragment (columns 2+3); wrapped `<Header />` in `<Suspense>` in `app/(app)/layout.tsx` for PPR compliance; `pnpm build` zero errors, both `/` and `/history` show `◐`

@@ -12,3 +12,11 @@ export function formatDate(iso: string): string {
     minute: "2-digit",
   });
 }
+
+export function getInitials(localPart: string): string {
+  const parts = localPart.split(/[._-]/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return localPart.slice(0, 2).toUpperCase();
+}
