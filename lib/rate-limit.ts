@@ -2,7 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 
-export const DAILY_LIMIT = 5;
+export const DAILY_LIMIT = 10;
 
 export type RateLimitResult = {
   ok: boolean;

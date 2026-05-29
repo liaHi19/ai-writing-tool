@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
+import { refresh, updateTag } from "next/cache";
 
 import { MODEL_ID } from "@/lib/anthropic";
 import { getAuthenticatedUser } from "@/lib/supabase/server";
@@ -44,7 +44,8 @@ export async function saveGeneration(
     return { ok: false, error: "Failed to save" };
   }
 
-  revalidateTag(`history:${user.id}`, "max");
+  updateTag(`history:${user.id}`);
+  refresh();
 
   return { ok: true, id: data.id };
 }
@@ -59,15 +60,18 @@ export async function deleteGeneration(
   const { supabase, user } = await getAuthenticatedUser();
   if (!user) return { ok: false, error: "Unauthorized" };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("generations")
     .delete()
     .eq("id", id)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .select("id");
 
   if (error) return { ok: false, error: error.message };
+  if (!data || data.length === 0) return { ok: false, error: "Not found" };
 
-  revalidateTag(`history:${user.id}`, "max");
+  updateTag(`history:${user.id}`);
+  refresh();
   return { ok: true };
 }
 
@@ -87,6 +91,7 @@ export async function clearAllGenerations(): Promise<ClearAllGenerationsResult> 
 
   if (error) return { ok: false, error: error.message };
 
-  revalidateTag(`history:${user.id}`, "max");
+  updateTag(`history:${user.id}`);
+  refresh();
   return { ok: true, deleted: data?.length ?? 0 };
 }

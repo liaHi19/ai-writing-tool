@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Check, Copy, Loader2, Save } from "lucide-react";
+import { useState } from "react";
+import { Check, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useWatch, type Control } from "react-hook-form";
 
 import { saveGeneration } from "@/actions/generations";
 import { Button } from "@/components/ui/button";
+import { CopyButton } from "@/components/editor/CopyButton";
 import { MODE_META } from "@/lib/constants";
 import { countChars, countWords } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
@@ -27,34 +28,15 @@ export function OutputCard({
   const mode = useWatch({ control, name: "mode" }) as Mode;
   const input = useWatch({ control, name: "text" }) ?? "";
 
-  const [copied, setCopied] = useState(false);
   const [savedCompletion, setSavedCompletion] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Derived: a completion counts as saved only if it exactly matches the
-  // snapshot we last persisted. A new stream produces a different string and
-  // naturally resets the flag without a useEffect.
   const saved = !!completion && savedCompletion === completion;
 
   const isEmpty = !completion && !isLoading;
   const chars = countChars(completion);
   const words = countWords(completion);
   const modeName = MODE_META[mode].name;
-
-  // Reset the Copy button's check-icon after 2 s. useEffect lets us clear the
-  // timer on unmount (or on a second copy before the first expires) instead of
-  // leaving a stray setTimeout firing setCopied on a dead component.
-  useEffect(() => {
-    if (!copied) return;
-    const id = setTimeout(() => setCopied(false), 2000);
-    return () => clearTimeout(id);
-  }, [copied]);
-
-  async function handleCopy() {
-    await navigator.clipboard.writeText(completion);
-    setCopied(true);
-    toast.success("Copied");
-  }
 
   async function handleSave() {
     setSaving(true);
@@ -78,17 +60,7 @@ export function OutputCard({
           Output · {modeName}
         </span>
         <div className="flex items-center gap-1.5">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="rounded-full px-4"
-            onClick={handleCopy}
-            disabled={!completion}
-          >
-            {copied ? <Check /> : <Copy />}
-            {copied ? "Copied" : "Copy"}
-          </Button>
+          <CopyButton text={completion} className="rounded-full px-4" />
           <Button
             type="button"
             variant="outline"

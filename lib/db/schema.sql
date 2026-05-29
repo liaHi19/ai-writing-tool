@@ -22,6 +22,10 @@ create policy "generations_insert_own"
   on public.generations for insert
   with check (auth.uid() = user_id);
 
+create policy "generations_delete_own"
+  on public.generations for delete
+  using (auth.uid() = user_id);
+
 -- usage_daily: per-user daily generation count for rate limiting
 create table if not exists public.usage_daily (
   user_id uuid not null references auth.users(id) on delete cascade,
