@@ -1,5 +1,4 @@
 import { streamText } from "ai";
-import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { anthropic, MODEL_ID } from "@/lib/anthropic";
@@ -13,7 +12,7 @@ function errorResponse(message: string, status: number) {
 }
 
 export async function POST(request: Request) {
-  const { supabase, user } = await getAuthenticatedUser();
+  const { user } = await getAuthenticatedUser();
 
   if (!user) return errorResponse("Unauthorized", 401);
 
@@ -42,33 +41,17 @@ export async function POST(request: Request) {
   }
 
   const userId = user.id;
-  const input = text;
-  const selectedMode = mode;
 
   const result = streamText({
     model: anthropic(MODEL_ID),
-    system: PROMPTS[selectedMode],
-    prompt: input,
-    onFinish: async ({ text: output }) => {
-      const { error: insertError } = await supabase.from("generations").insert({
-        user_id: userId,
-        mode: selectedMode,
-        input,
-        output,
-        model: MODEL_ID,
-      });
-      if (insertError) {
-        console.error("Failed to persist generation:", insertError);
-        return;
-      }
-
+    system: PROMPTS[mode],
+    prompt: text,
+    onFinish: async () => {
       try {
         await incrementUsage(userId);
       } catch (err) {
         console.error("Failed to increment usage:", err);
       }
-
-      revalidateTag(`history:${userId}`, "hours");
     },
   });
 
