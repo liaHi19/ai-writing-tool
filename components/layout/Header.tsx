@@ -11,8 +11,8 @@ export async function Header() {
   const count = user ? (await fetchHistory(user.id)).length : 0;
 
   return (
-    <header className="px-8 pt-6">
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 mb-7">
+    <header className="pt-6">
+      <div className="container max-w-6xl grid grid-cols-[1fr_auto_1fr] items-center gap-6 mb-7">
         <div className="flex items-center gap-3">
           <div className="size-7 flex items-center justify-center font-mono font-medium text-[14px] tracking-[-0.02em] bg-(--fg) text-(--bg) rounded-sm">
             P

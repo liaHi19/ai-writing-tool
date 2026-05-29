@@ -17,17 +17,17 @@ export const MODE_LABELS: Record<Mode, string> = {
 };
 
 export const MODE_META: Record<Mode, { name: string; description: string }> = {
-  improve: { name: "Improve", description: "Tighten clarity and flow" },
-  email: { name: "Email", description: "Draft a polished business email" },
+  improve: { name: "Improve", description: "Clarity + flow" },
+  email: { name: "Email", description: "Polite, structured" },
   linkedin: {
     name: "LinkedIn",
-    description: "Write a hook-first professional post",
+    description: "Public, narrative",
   },
   technical: {
     name: "Technical",
-    description: "Rewrite for engineers and practitioners",
+    description: "Precise, no fluff",
   },
-  casual: { name: "Casual", description: "Make it warm and conversational" },
+  casual: { name: "Casual", description: "Friendly, light" },
 };
 
 export const HEADER_ICONS = {

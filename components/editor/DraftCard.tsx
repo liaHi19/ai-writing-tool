@@ -1,10 +1,13 @@
 "use client";
 
+import { Sparkles } from "lucide-react";
+import { useWatch, type Control } from "react-hook-form";
+
 import { Button } from "@/components/ui/button";
 import { useHint } from "@/hooks/useHint";
 import { MODE_META } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { type GenerateInput } from "@/lib/validation/generate";
-import { useWatch, type Control } from "react-hook-form";
 
 const MAX_CHARS = 2400;
 const ACCENT_THRESHOLD = 2112; // 88% of 2400
@@ -26,57 +29,86 @@ export function DraftCard({
 }: DraftCardProps) {
   const hint = useHint();
   const mode = useWatch({ control, name: "mode" });
+
   const chars = value.length;
   const fillPct = Math.min(100, (chars / MAX_CHARS) * 100);
   const isNearLimit = chars >= ACCENT_THRESHOLD;
   const canSubmit = !isLoading && value.trim().length >= 10;
+  const isDisabled = (!value && !isLoading) || isLoading;
 
   return (
-    <div className="bg-(--surface) rounded-radius border border-border p-4">
+    <div className="bg-(--surface) border border-border rounded-(--radius) p-5.5 flex flex-col">
+      {/* Card head — label left, actions right */}
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-(--fg-muted)">
+          Draft
+        </span>
+        <div className="flex items-center gap-1.5">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="rounded-full px-4"
+            onClick={onClear}
+            disabled={isDisabled}
+          >
+            Clear
+          </Button>
+          <Button
+            type="submit"
+            size="sm"
+            className="rounded-full px-4"
+            disabled={!canSubmit}
+          >
+            <Sparkles />
+            {isLoading ? "Polishing…" : `Rewrite as ${MODE_META[mode].name}`}
+          </Button>
+        </div>
+      </div>
+
+      {/* Borderless textarea */}
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value.slice(0, MAX_CHARS))}
-        placeholder="Paste your text here…"
+        placeholder="Paste or write your draft. Pick a mode above, then rewrite."
         disabled={isLoading}
         rows={10}
-        className="w-full min-h-70 bg-(--surface) text-(--fg) placeholder:text-(--fg-dim) resize-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 rounded-sm text-sm"
+        spellCheck
+        className="w-full min-h-60 resize-none border-none bg-transparent p-0 text-base leading-[1.55] tracking-[-0.005em] text-(--fg) placeholder:text-(--fg-dim) outline-none"
       />
 
-      {/* Progress bar */}
-      <div className="mt-3 h-1 bg-(--surface-2) rounded-full overflow-hidden">
+      {/* Foot — dashed top, counter+bar on left, hint on right */}
+      <div className="mt-3.5 flex items-center justify-between border-t border-dashed border-border pt-3.5">
         <div
-          className="h-full transition-all duration-150"
-          style={{
-            width: `${fillPct}%`,
-            backgroundColor: isNearLimit ? "var(--accent)" : "var(--fg)",
-          }}
-        />
-      </div>
-
-      {/* Count + hint */}
-      <div className="mt-1.5 flex items-center justify-between text-xs font-mono">
-        <span
-          style={{ color: isNearLimit ? "var(--accent)" : "var(--fg-dim)" }}
+          className={cn(
+            "flex items-center gap-2.5 font-mono text-xs text-(--fg-muted)",
+            isNearLimit && "text-accent",
+          )}
         >
-          {chars} / {MAX_CHARS}
+          <div className="h-1 w-20 overflow-hidden rounded-full bg-(--surface-2)">
+            <div
+              className="h-full transition-[width,background] duration-200"
+              style={{
+                width: `${fillPct}%`,
+                backgroundColor: isNearLimit ? "var(--accent)" : "var(--fg)",
+              }}
+            />
+          </div>
+          <span>
+            <b
+              className={cn(
+                "font-medium",
+                isNearLimit ? "text-accent" : "text-(--fg)",
+              )}
+            >
+              {chars.toLocaleString()}
+            </b>{" "}
+            / {MAX_CHARS.toLocaleString()}
+          </span>
+        </div>
+        <span className="font-mono text-[11px] uppercase tracking-[0.04em] text-(--fg-dim)">
+          {hint} to rewrite
         </span>
-        <span className="text-(--fg-dim)">{hint} to rewrite</span>
-      </div>
-
-      {/* Actions */}
-      <div className="mt-3 flex items-center justify-between">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onClear}
-          disabled={!value || isLoading}
-        >
-          Clear
-        </Button>
-        <Button type="submit" disabled={!canSubmit}>
-          {isLoading ? "Rewriting…" : `Rewrite as ${MODE_META[mode].name}`}
-        </Button>
       </div>
     </div>
   );

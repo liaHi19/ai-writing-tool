@@ -12,41 +12,59 @@ interface ModeCardProps {
 
 export function ModeCard({ value, onChange, disabled }: ModeCardProps) {
   return (
-    <div className="flex flex-col gap-2">
-      {MODES.map((mode, i) => {
-        const active = value === mode;
-        const idx = String(i + 1).padStart(2, "0");
-        const { name, description } = MODE_META[mode];
-        return (
-          <button
-            key={mode}
-            type="button"
-            disabled={disabled}
-            onClick={() => onChange(mode)}
-            className={cn(
-              "relative w-full rounded-sm p-4 text-left transition-colors",
-              active
-                ? "bg-(--fg) text-(--accent-fg)"
-                : "bg-(--surface) text-(--fg) border border-border hover:bg-(--surface-2)",
-              disabled && "cursor-not-allowed opacity-50",
-            )}
-          >
-            {active && (
-              <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-accent" />
-            )}
-            <span className="block font-mono text-xs opacity-50">{idx}</span>
-            <span className="mt-1 block font-medium">{name}</span>
-            <span
+    <section className="flex h-full flex-col rounded-(--radius) border border-border bg-(--surface) p-5.5">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-(--fg-muted)">
+          Mode
+        </span>
+        <span className="font-mono text-[11px] text-(--fg-dim)">
+          {MODES.length} presets
+        </span>
+      </div>
+      <div className="grid grid-cols-5 gap-2">
+        {MODES.map((mode, i) => {
+          const active = value === mode;
+          const idx = String(i + 1).padStart(2, "0");
+          const { name, description } = MODE_META[mode];
+          return (
+            <button
+              key={mode}
+              type="button"
+              disabled={disabled}
+              onClick={() => onChange(mode)}
               className={cn(
-                "mt-0.5 block text-sm",
-                active ? "opacity-60" : "text-(--fg-muted)",
+                "flex flex-col gap-2 rounded-sm border px-2.5 pt-3.5 pb-3 text-left transition-colors",
+                active
+                  ? "border-(--fg) bg-(--fg) text-(--surface)"
+                  : "border-transparent bg-(--surface-2) hover:bg-(--surface)",
+                disabled && "cursor-not-allowed opacity-50",
               )}
             >
-              {description}
-            </span>
-          </button>
-        );
-      })}
-    </div>
+              <span
+                className={cn(
+                  "font-mono text-[10px] tracking-[0.06em]",
+                  active ? "text-(--surface-2) opacity-70" : "text-(--fg-dim)",
+                )}
+              >
+                {idx}
+              </span>
+              <span className="text-sm font-medium tracking-[-0.01em]">
+                {name}
+              </span>
+              <span
+                className={cn(
+                  "font-mono text-[11px] leading-[1.35]",
+                  active
+                    ? "text-(--surface-2) opacity-70"
+                    : "text-(--fg-muted)",
+                )}
+              >
+                {description}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }

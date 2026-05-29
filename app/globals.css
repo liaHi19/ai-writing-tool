@@ -103,4 +103,12 @@
   html {
     @apply font-sans;
   }
+  button:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: --spacing(6);
 }
