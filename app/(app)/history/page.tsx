@@ -5,15 +5,8 @@ import { HistoryListSkeleton } from "@/components/history/HistoryListSkeleton";
 
 export default function HistoryPage() {
   return (
-    <div className="bg-zinc-50 p-6">
-      <div className="mx-auto max-w-3xl space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">History</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Your past AI generations, newest first.
-          </p>
-        </div>
-
+    <div className="min-h-screen bg-(--bg) py-6">
+      <div className="container max-w-6xl space-y-4">
         <Suspense fallback={<HistoryListSkeleton />}>
           <HistoryList />
         </Suspense>
