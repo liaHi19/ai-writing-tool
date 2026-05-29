@@ -13,3 +13,11 @@ export const generateSchema = z.object({
 export type GenerateInput = z.infer<typeof generateSchema>;
 
 export const generateDefaults: GenerateInput = { text: "", mode: "improve" };
+
+export const saveGenerationSchema = z.object({
+  mode: z.enum(MODES),
+  input: z.string().trim().min(1, "Input is required").max(2400),
+  output: z.string().trim().min(1, "Output is required").max(16_000),
+});
+
+export type SaveGenerationInput = z.infer<typeof saveGenerationSchema>;

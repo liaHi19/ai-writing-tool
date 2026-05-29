@@ -20,3 +20,11 @@ export function getInitials(localPart: string): string {
   }
   return localPart.slice(0, 2).toUpperCase();
 }
+
+export function countWords(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+export function countChars(text: string): number {
+  return text.length;
+}
