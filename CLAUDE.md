@@ -32,8 +32,10 @@ app/
   api/
     generate/route.ts             POST { text, mode } -> streamed text response (Edge or Node runtime)
 components/
-  ui/                             shadcn primitives
+  ui/                             shadcn primitives only — never add custom components here
   editor/                         InputArea, ModeSelector, OutputPane, CopyButton
+  history/                        HistoryCard, HistoryList
+  confirm-dialog.tsx              shared reusable components live here at components/ root
 lib/
   anthropic.ts                    Vercel AI SDK client + model id constant
   prompts.ts                      System prompt per mode (improve/email/linkedin/technical/casual)
@@ -119,7 +121,7 @@ SUPABASE_SERVICE_ROLE_KEY=        # server-only, never imported in client compon
 - **Routing:** App Router with route groups `(auth)` and `(app)`. Server Components by default; add `"use client"` only when needed (forms, streaming hooks).
 - **Data access:** All DB reads/writes go through `lib/supabase/server.ts` (server) or `lib/supabase/client.ts` (browser). No direct `createClient` calls in components.
 - **Prompts:** One system prompt per mode in `lib/prompts.ts`, exported as `PROMPTS: Record<Mode, string>`. `Mode` is a string-literal union, single source of truth.
-- **UI:** shadcn components installed via `pnpm dlx shadcn@latest add <name>` into `components/ui/`. Don't edit them ad-hoc; wrap them in `components/editor/*` for app-specific behavior.
+- **UI:** shadcn components installed via `pnpm dlx shadcn@latest add <name>` into `components/ui/`. **Never add custom components to `components/ui/`** — that folder is shadcn-only. Custom reusable components that compose shadcn primitives live at `components/<name>.tsx` (root level). Feature-scoped components live in `components/<feature>/`.
 - **Styling:** Tailwind utility classes; no inline `style=` except for dynamic values. Use `cn()` helper from `lib/utils.ts` for conditional classes.
 - **Naming:** kebab-case files, PascalCase components, camelCase functions, SCREAMING_SNAKE for env constants.
 - **Errors:** Route handlers return `{ error: string }` with appropriate status; client surfaces via toast (`sonner`).
