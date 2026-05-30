@@ -52,6 +52,8 @@ export function EditorPanel() {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        const target = e.target as HTMLElement;
+        if (target.dataset.outputEditor) return;
         e.preventDefault();
         form.handleSubmit(onValid)();
       }
