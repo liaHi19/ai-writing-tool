@@ -22,6 +22,11 @@ create policy "generations_insert_own"
   on public.generations for insert
   with check (auth.uid() = user_id);
 
+create policy "generations_update_own"
+  on public.generations for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
 create policy "generations_delete_own"
   on public.generations for delete
   using (auth.uid() = user_id);

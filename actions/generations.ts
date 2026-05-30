@@ -75,6 +75,34 @@ export async function deleteGeneration(
   return { ok: true };
 }
 
+export type UpdateGenerationResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
+export async function updateGeneration(
+  id: string,
+  output: string,
+): Promise<UpdateGenerationResult> {
+  if (!output.trim()) return { ok: false, error: "Output cannot be empty" };
+
+  const { supabase, user } = await getAuthenticatedUser();
+  if (!user) return { ok: false, error: "Unauthorized" };
+
+  const { data, error } = await supabase
+    .from("generations")
+    .update({ output })
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .select("id");
+
+  if (error) return { ok: false, error: error.message };
+  if (!data || data.length === 0) return { ok: false, error: "Not found" };
+
+  updateTag(`history:${user.id}`);
+  refresh();
+  return { ok: true };
+}
+
 export type ClearAllGenerationsResult =
   | { ok: true; deleted: number }
   | { ok: false; error: string };
