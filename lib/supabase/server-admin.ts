@@ -44,7 +44,7 @@ export async function countGenerationsByUserId(
 ): Promise<number> {
   const { count, error } = await adminClient()
     .from("generations")
-    .select("*", { count: "exact", head: true })
+    .select("id", { count: "exact", head: true })
     .eq("user_id", userId);
 
   if (error) {
