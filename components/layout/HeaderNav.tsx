@@ -1,11 +1,12 @@
 "use client";
 
 import { signOut } from "@/actions/auth";
-import { HEADER_ICONS } from "@/lib/constants";
+import { HEADER_ICONS, MODE_LABELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useMode } from "@/providers/ModeProvider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Icon } from "./Icon";
+import { Icon } from "../shared/Icon";
 
 type Props = {
   count: number;
@@ -15,6 +16,7 @@ type Props = {
 
 export function HeaderNav({ count, userLocalPart, initials }: Props) {
   const pathname = usePathname();
+  const { mode } = useMode();
   const isWrite = pathname === "/";
   const isHistory = pathname === "/history";
 
@@ -65,8 +67,7 @@ export function HeaderNav({ count, userLocalPart, initials }: Props) {
       {/* Right: meta string + user chip + sign-out */}
       <div className="flex items-center justify-end gap-3">
         <span className="hidden sm:block font-mono text-[11px] uppercase tracking-[0.08em] text-(--fg-muted)">
-          {/* mode is getting from mode selector in the future */}
-          {isHistory ? `${count} ENTRIES` : "IMPROVE MODE"}
+          {isHistory ? `${count} ENTRIES` : `${MODE_LABELS[mode]} MODE`}
         </span>
         <div className="inline-flex items-center gap-2.5 rounded-full bg-(--surface) border border-border py-1 px-3">
           <span className="text-[13px] font-medium text-(--fg)">
