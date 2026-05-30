@@ -37,8 +37,8 @@ export function HistoryToolbar({
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="relative max-w-90 flex-1">
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div className="relative w-full sm:max-w-90 sm:flex-1">
         <Search
           size={14}
           className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-(--fg-dim)"
@@ -52,7 +52,7 @@ export function HistoryToolbar({
         />
       </div>
 
-      <div className="inline-flex gap-0.5 rounded-full border border-border bg-(--surface) p-1">
+      <div className="flex max-w-full flex-wrap gap-0.5 rounded-full border border-border bg-(--surface) p-1">
         <FilterChip
           active={filter === "all"}
           onClick={() => onFilterChange("all")}

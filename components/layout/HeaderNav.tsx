@@ -22,8 +22,9 @@ export function HeaderNav({ count, userLocalPart, initials }: Props) {
 
   return (
     <>
-      {/* Middle: segmented pill tabs */}
-      <nav className="inline-flex rounded-full p-1 gap-0.5 bg-(--surface) border border-border">
+      {/* Middle: segmented pill tabs — own full-width row on mobile, grid cell from sm */}
+      <div className="order-last w-full flex justify-center sm:contents">
+        <nav className="inline-flex rounded-full p-1 gap-0.5 bg-(--surface) border border-border">
         <Link
           href="/"
           data-on={isWrite}
@@ -62,15 +63,16 @@ export function HeaderNav({ count, userLocalPart, initials }: Props) {
             {count}
           </span>
         </Link>
-      </nav>
+        </nav>
+      </div>
 
       {/* Right: meta string + user chip + sign-out */}
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex items-center justify-end gap-2 sm:gap-3">
         <span className="hidden sm:block font-mono text-[11px] uppercase tracking-[0.08em] text-(--fg-muted)">
           {isHistory ? `${count} ENTRIES` : `${MODE_LABELS[mode]} MODE`}
         </span>
-        <div className="inline-flex items-center gap-2.5 rounded-full bg-(--surface) border border-border py-1 px-3">
-          <span className="text-[13px] font-medium text-(--fg)">
+        <div className="inline-flex items-center gap-2.5 rounded-full bg-(--surface) border border-border py-1 px-1 sm:px-3">
+          <span className="hidden sm:inline text-[13px] font-medium text-(--fg)">
             {userLocalPart}
           </span>
           <div className="size-7 rounded-full flex items-center justify-center font-mono text-[11px] font-medium bg-(--fg) text-(--bg)">

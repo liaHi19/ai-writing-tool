@@ -12,7 +12,7 @@ export async function Header() {
 
   return (
     <header className="pt-6">
-      <div className="container max-w-6xl grid grid-cols-[1fr_auto_1fr] items-center gap-6 mb-7">
+      <div className="container max-w-6xl flex flex-wrap items-center justify-between gap-3 mb-7 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:gap-6">
         <div className="flex items-center gap-3">
           <div className="size-7 flex items-center justify-center font-mono font-medium text-[14px] tracking-[-0.02em] bg-(--fg) text-(--bg) rounded-sm">
             P

@@ -67,8 +67,8 @@ export function EditorPanel() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
             <div className="grid grid-cols-12 gap-4">
-              {/* Mode selector — col-span-7 */}
-              <div className="col-span-7">
+              {/* Mode selector — col-span-7 on md+, full-width first on mobile */}
+              <div className="col-span-12 order-1 md:order-0 md:col-span-7">
                 <FormField
                   control={form.control}
                   name="mode"
@@ -86,13 +86,13 @@ export function EditorPanel() {
                 />
               </div>
 
-              {/* Stats — col-span-5 */}
-              <div className="col-span-5">
+              {/* Stats — col-span-5 on md+, below the draft on mobile */}
+              <div className="col-span-12 order-3 md:order-0 md:col-span-5">
                 <StatsCard control={form.control} />
               </div>
 
-              {/* Draft — col-span-12 */}
-              <div className="col-span-12">
+              {/* Draft — col-span-12, second on mobile */}
+              <div className="col-span-12 order-2 md:order-0">
                 <FormField
                   control={form.control}
                   name="text"
@@ -121,8 +121,8 @@ export function EditorPanel() {
                 />
               </div>
 
-              {/* Output — col-span-12 */}
-              <div className="col-span-12">
+              {/* Output — col-span-12, last on mobile */}
+              <div className="col-span-12 order-4 md:order-0">
                 <OutputCard
                   completion={completion}
                   isLoading={isLoading}

@@ -38,8 +38,8 @@ export function DraftCard({
 
   return (
     <div className="bg-(--surface) border border-border rounded-(--radius) p-5.5 flex flex-col">
-      {/* Card head — label left, actions right */}
-      <div className="mb-4 flex items-center justify-between gap-3">
+      {/* Card head — label left, actions right; stacks on mobile */}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="font-mono text-[11px] uppercase tracking-widest text-(--fg-muted)">
           Draft
         </span>
@@ -48,7 +48,7 @@ export function DraftCard({
             type="button"
             variant="ghost"
             size="sm"
-            className="rounded-full px-4"
+            className="flex-1 rounded-full px-4 sm:flex-none"
             onClick={onClear}
             disabled={isDisabled}
           >
@@ -57,7 +57,7 @@ export function DraftCard({
           <Button
             type="submit"
             size="sm"
-            className="rounded-full px-4"
+            className="flex-1 rounded-full px-4 sm:flex-none"
             disabled={!canSubmit}
           >
             <Sparkles />
@@ -78,7 +78,7 @@ export function DraftCard({
       />
 
       {/* Foot — dashed top, counter+bar on left, hint on right */}
-      <div className="mt-3.5 flex items-center justify-between border-t border-dashed border-border pt-3.5">
+      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t border-dashed border-border pt-3.5">
         <div
           className={cn(
             "flex items-center gap-2.5 font-mono text-xs text-(--fg-muted)",

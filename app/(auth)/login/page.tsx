@@ -19,7 +19,7 @@ export default function LoginPage() {
       </div>
 
       {/* Bento card */}
-      <div className="w-full max-w-sm bg-(--surface) border border-border rounded-(--radius) p-8 space-y-6">
+      <div className="w-full max-w-sm bg-(--surface) border border-border rounded-(--radius) p-6 sm:p-8 space-y-6">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
           <p className="text-sm text-(--fg-muted)">

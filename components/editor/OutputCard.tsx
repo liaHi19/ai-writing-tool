@@ -54,18 +54,21 @@ export function OutputCard({
 
   return (
     <div className="bg-(--surface) border border-border rounded-(--radius) p-5.5 flex flex-col">
-      {/* Card head — "Output · {mode}" label + Copy/Save actions */}
-      <div className="mb-4 flex items-center justify-between gap-3">
+      {/* Card head — "Output · {mode}" label + Copy/Save actions; stacks on mobile */}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="font-mono text-[11px] uppercase tracking-widest text-(--fg-muted)">
           Output · {modeName}
         </span>
         <div className="flex items-center gap-1.5">
-          <CopyButton text={completion} className="rounded-full px-4" />
+          <CopyButton
+            text={completion}
+            className="flex-1 rounded-full px-4 sm:flex-none"
+          />
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="rounded-full px-4"
+            className="flex-1 rounded-full px-4 sm:flex-none"
             onClick={handleSave}
             disabled={saveDisabled}
           >
@@ -106,7 +109,7 @@ export function OutputCard({
       </div>
 
       {/* Foot — chars/words left, mode · auto right */}
-      <div className="mt-3.5 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.04em] text-(--fg-dim)">
+      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] uppercase tracking-[0.04em] text-(--fg-dim)">
         <span>{isEmpty ? "—" : `${chars} chars · ${words} words`}</span>
         <span>{mode} · auto</span>
       </div>

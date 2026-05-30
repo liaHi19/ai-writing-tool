@@ -21,7 +21,7 @@ export function ModeCard({ value, onChange, disabled }: ModeCardProps) {
           {MODES.length} presets
         </span>
       </div>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
         {MODES.map((mode, i) => {
           const active = value === mode;
           const idx = String(i + 1).padStart(2, "0");

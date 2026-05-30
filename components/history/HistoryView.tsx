@@ -77,12 +77,7 @@ export function HistoryView({ generations }: { generations: Generation[] }) {
           </div>
         </div>
       ) : (
-        <div
-          className="grid gap-4"
-          style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-          }}
-        >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((gen) => (
             <HistoryCard key={gen.id} gen={gen} />
           ))}
