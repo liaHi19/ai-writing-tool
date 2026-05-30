@@ -47,7 +47,7 @@ lib/
 proxy.ts                          (Next 16) Refresh Supabase session on every request — replaces middleware.ts
 ```
 
-**Request flow:** client posts to `/api/generate` → proxy refreshes session → route handler authenticates user, checks rate limit, selects system prompt by mode, calls `streamText`, persists final output to `generations` on stream finish (`onFinish`), returns `result.toDataStreamResponse()`. Client consumes via `useCompletion`.
+**Request flow:** client posts to `/api/generate` → proxy refreshes session → route handler authenticates user, checks rate limit, selects system prompt by mode, calls `streamText`, increments the usage counter on stream finish (`onFinish`), returns `result.toTextStreamResponse()`. Client consumes via `useCompletion`. Generations are **not** auto-persisted — the user explicitly saves an output via the `saveGeneration` server action (opt-in save), which inserts the row and invalidates the history cache.
 
 **DB tables:**
 
@@ -105,7 +105,7 @@ SUPABASE_SERVICE_ROLE_KEY=        # server-only, never imported in client compon
 - **Every** user-owned table must have RLS enabled with explicit `select`/`insert` policies scoped by `auth.uid()`.
 - **Always** check the rate limit (`lib/rate-limit.ts`) before invoking the model in `/api/generate`.
 - **Always** stream — never buffer the full Anthropic response before returning.
-- Persist generations in `onFinish`, not after `await`-ing the stream client-side.
+- Increment the usage counter in `onFinish` (server-side), never client-side after the stream. Persisting a generation is opt-in: the user saves an output via the `saveGeneration` server action, which authenticates, inserts the row, and calls `revalidateTag` — do not auto-insert generations in `onFinish`.
 - Validate `mode` against an enum on the server; reject unknown modes with 400.
 - Use the pinned model id `claude-sonnet-4-6` from `lib/anthropic.ts`; don't hardcode model strings elsewhere.
 - No `any`. No `// @ts-ignore` without a comment explaining the constraint.

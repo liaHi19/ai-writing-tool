@@ -1,5 +1,5 @@
 import { getInitials } from "@/lib/helpers";
-import { fetchHistory } from "@/lib/history";
+import { fetchHistoryCount } from "@/lib/history";
 import { getAuthenticatedUser } from "@/lib/supabase/server";
 import { HeaderNav } from "./HeaderNav";
 
@@ -8,7 +8,7 @@ export async function Header() {
 
   const localPart = user?.email?.split("@")[0] ?? "user";
   const initials = getInitials(localPart);
-  const count = user ? (await fetchHistory(user.id)).length : 0;
+  const count = user ? await fetchHistoryCount(user.id) : 0;
 
   return (
     <header className="pt-6">

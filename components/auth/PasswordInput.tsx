@@ -6,9 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type PasswordInputProps = Omit<React.ComponentProps<typeof Input>, "type"> & {
-  autoComplete?: string;
-};
+type PasswordInputProps = Omit<React.ComponentProps<typeof Input>, "type">;
 
 export function PasswordInput({ className, ...props }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
@@ -26,8 +24,8 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
         size="icon"
         className="absolute right-0 top-0 h-full w-10 text-muted-foreground hover:text-foreground hover:bg-transparent"
         onClick={() => setVisible((v) => !v)}
-        tabIndex={-1}
         aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
       >
         {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
       </Button>

@@ -33,3 +33,24 @@ export async function fetchGenerationsByUserId(
 
   return data ?? [];
 }
+
+/**
+ * Count a user's generations without fetching the rows. Bypasses RLS —
+ * caller is responsible for having authenticated the user first.
+ * Safe to call inside "use cache" because it does not read cookies().
+ */
+export async function countGenerationsByUserId(
+  userId: string,
+): Promise<number> {
+  const { count, error } = await adminClient()
+    .from("generations")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("countGenerationsByUserId error:", error);
+    return 0;
+  }
+
+  return count ?? 0;
+}
