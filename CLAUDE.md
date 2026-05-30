@@ -6,8 +6,8 @@ A Next.js app where a user pastes text, picks a mode (improve / email / linkedin
 
 ## Read the following to get the full context of the project:
 
-- @context/coding-standards.md
-- @context/ai-interaction.md
+- @standards/coding-standards.md
+- @standards/ai-interaction.md
 - @context/current-feature.md
 
 ## Stack
