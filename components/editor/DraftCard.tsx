@@ -34,7 +34,7 @@ export function DraftCard({
   const fillPct = Math.min(100, (chars / MAX_CHARS) * 100);
   const isNearLimit = chars >= ACCENT_THRESHOLD;
   const canSubmit = !isLoading && value.trim().length >= 10;
-  const isDisabled = (!value && !isLoading) || isLoading;
+  const isDisabled = !value && !isLoading;
 
   return (
     <div className="bg-(--surface) border border-border rounded-(--radius) p-5.5 flex flex-col">

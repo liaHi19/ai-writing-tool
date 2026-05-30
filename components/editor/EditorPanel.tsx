@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { useCallback, useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -17,6 +18,7 @@ import {
   generateSchema,
   type GenerateInput,
 } from "@/lib/validation/generate";
+import { useMode } from "@/providers/ModeProvider";
 import { DraftCard } from "./DraftCard";
 import { ModeCard } from "./ModeCard";
 import { OutputCard } from "./OutputCard";
@@ -29,7 +31,15 @@ export function EditorPanel() {
     mode: "onTouched",
   });
 
-  const { completion, isLoading, complete } = useGenerate();
+  const { completion, isLoading, complete, setCompletion, stop } =
+    useGenerate();
+
+  const { setMode } = useMode();
+  const selectedMode = useWatch({ control: form.control, name: "mode" });
+
+  useEffect(() => {
+    setMode(selectedMode);
+  }, [selectedMode, setMode]);
 
   const onValid = useCallback(
     (data: GenerateInput) => {
@@ -93,11 +103,15 @@ export function EditorPanel() {
                           value={field.value}
                           onChange={field.onChange}
                           control={form.control}
-                          onClear={() =>
-                            form.setValue("text", "", {
-                              shouldValidate: true,
-                            })
-                          }
+                          onClear={() => {
+                            if (isLoading) {
+                              stop();
+                              toast.info("Generation cancelled");
+                            }
+                            form.setValue("text", "");
+                            form.clearErrors("text");
+                            setCompletion("");
+                          }}
                           isLoading={isLoading}
                         />
                       </FormControl>

@@ -29,3 +29,4 @@
 | 17      | ConfirmDialog   | AlertDialog design polish; extracted reusable `ConfirmDialog` at `components/confirm-dialog.tsx`; enforced `components/ui/` as shadcn-only in `CLAUDE.md`  |
 | 18      | History toolbar | `HistoryToolbar` (search input + mode chips with unfiltered counts + Clear-all), `HistoryView` client wrapper with `useMemo` filtering, `useDebounce` hook |
 | 19      | Auth pages restyle | Brand block (P square + "Polish" wordmark) above a single bento card on `/login` and `/signup`; cool-fog background; `.tmp-polish/**` excluded from ESLint; `lint`, `typecheck`, `build` all clean |
+| 20      | Mode context + Clear fix | `ModeProvider` context driving live header mode label; relocated `ConfirmDialog`/`Icon` to `components/shared/`; auth `PasswordInput` (visibility toggle) + form-message spacing; Clear button now resets output, clears the validation error, and aborts in-flight generation with a "cancelled" toast |
