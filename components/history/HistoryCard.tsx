@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { deleteGeneration } from "@/actions/generations";
 import { CopyButton } from "@/components/editor/CopyButton";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import type { Tables } from "@/lib/db/types";
 import {
   countChars,

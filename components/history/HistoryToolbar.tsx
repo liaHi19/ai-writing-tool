@@ -4,7 +4,7 @@ import { Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { clearAllGenerations } from "@/actions/generations";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { MODES, MODE_LABELS } from "@/lib/constants";
 import { type Mode } from "@/lib/prompts";
 import { cn } from "@/lib/utils";
