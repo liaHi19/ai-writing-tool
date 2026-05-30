@@ -33,25 +33,14 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
 
 export async function incrementUsage(userId: string): Promise<void> {
   const supabase = await createClient();
-  const day = todayUtc();
 
-  const { data, error: selectError } = await supabase
-    .from("usage_daily")
-    .select("count")
-    .eq("user_id", userId)
-    .eq("day", day)
-    .maybeSingle();
+  // Atomic upsert in Postgres (see `increment_usage` in lib/db/schema.sql).
+  // Performing the read + write in a single statement avoids a TOCTOU race
+  // where concurrent generations both read the same count and under-count it.
+  const { error } = await supabase.rpc("increment_usage", {
+    p_user_id: userId,
+    p_day: todayUtc(),
+  });
 
-  if (selectError) throw selectError;
-
-  const nextCount = (data?.count ?? 0) + 1;
-
-  const { error: upsertError } = await supabase
-    .from("usage_daily")
-    .upsert(
-      { user_id: userId, day, count: nextCount },
-      { onConflict: "user_id,day" },
-    );
-
-  if (upsertError) throw upsertError;
+  if (error) throw error;
 }

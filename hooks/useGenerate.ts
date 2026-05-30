@@ -4,12 +4,17 @@ import { useCompletion } from "@ai-sdk/react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { MODES } from "@/lib/constants";
 import { generateSchema } from "@/lib/validation/generate";
 
 // useCompletion posts { prompt, mode }; the route expects { text, mode }.
 // mode is kept here (not stripped) so it survives into the renamed body;
-// generateSchema does the real enum validation downstream.
-const completionBodySchema = z.object({ prompt: z.string(), mode: z.string() });
+// z.enum(MODES) fails fast on an invalid mode rather than waiting for the
+// server's 400. The server still re-validates via generateSchema.
+const completionBodySchema = z.object({
+  prompt: z.string(),
+  mode: z.enum(MODES),
+});
 const errorBodySchema = z.object({ error: z.string().optional() });
 
 export function useGenerate() {

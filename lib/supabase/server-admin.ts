@@ -44,6 +44,8 @@ export async function countGenerationsByUserId(
 ): Promise<number> {
   const { count, error } = await adminClient()
     .from("generations")
+    // head: true issues a HEAD request, so the column arg is ignored by
+    // Supabase — kept as documentation that we want no row data, only count.
     .select("id", { count: "exact", head: true })
     .eq("user_id", userId);
 
