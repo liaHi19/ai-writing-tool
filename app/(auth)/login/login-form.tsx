@@ -1,12 +1,13 @@
 "use client";
 
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { toast } from "sonner";
 
+import { signIn, type SignInState } from "@/actions/auth";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -15,7 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signIn, type SignInState } from "@/actions/auth";
+import { Input } from "@/components/ui/input";
 import {
   authDefaults,
   signInSchema,
@@ -59,7 +60,9 @@ export default function LoginForm() {
               <FormControl>
                 <Input type="email" autoComplete="email" {...field} />
               </FormControl>
-              <FormMessage />
+              <div className="min-h-3">
+                <FormMessage className="text-xs pl-2" />
+              </div>
             </FormItem>
           )}
         />
@@ -70,13 +73,11 @@ export default function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
-                  autoComplete="current-password"
-                  {...field}
-                />
+                <PasswordInput autoComplete="current-password" {...field} />
               </FormControl>
-              <FormMessage />
+              <div className="min-h-3">
+                <FormMessage className="text-xs pl-2" />
+              </div>
             </FormItem>
           )}
         />
