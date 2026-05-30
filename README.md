@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Polish — AI Writing Tool
+
+Paste text, pick a mode, get a streamed AI rewrite. Built with Next.js 16, Supabase, and the Anthropic API.
+
+## Features
+
+- **5 writing modes** — Improve, Email, LinkedIn, Technical, Casual
+- **Streaming output** — responses stream token-by-token via Vercel AI SDK
+- **Auth** — email/password sign-up and login via Supabase Auth
+- **History** — per-user generation history with search and mode filtering
+- **Rate limiting** — per-user daily quota enforced server-side
+- **Responsive** — mobile-first layout, works from 375 px up
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) + TypeScript + React 19 |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| AI | Anthropic `claude-sonnet-4-6` via Vercel AI SDK (`streamText`) |
+| Auth & DB | Supabase (Postgres + Auth + RLS) |
+| Forms | React Hook Form + Zod |
+| Toasts | Sonner |
+| Package manager | pnpm |
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Set up environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env.local` at the project root:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+ANTHROPIC_API_KEY=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
 
-## Learn More
+### 3. Start Supabase locally
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+supabase start
+supabase db reset   # applies migrations + seed
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Run the dev server
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dev
+```
 
-## Deploy on Vercel
+Open [http://localhost:3000](http://localhost:3000).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/
+  (auth)/login, /signup     Auth pages
+  page.tsx                  Main editor
+  history/page.tsx          Generation history
+  api/generate/route.ts     Streaming POST endpoint
+components/
+  ui/                       shadcn primitives only
+  editor/                   InputArea, ModeSelector, OutputPane, CopyButton
+  history/                  HistoryCard, HistoryList, HistoryToolbar
+  shared/                   ConfirmDialog, Icon
+lib/
+  anthropic.ts              Vercel AI SDK client + model constant
+  prompts.ts                System prompt per mode
+  rate-limit.ts             Per-user daily quota check
+  supabase/                 SSR-aware Supabase clients
+  db/schema.sql             DB schema + RLS policies
+actions/                    Server Actions (auth, history mutations)
+hooks/                      useDebounce, useGenerate
+proxy.ts                    Session refresh on every request (Next 16)
+```
+
+## Commands
+
+```bash
+pnpm dev          # start dev server
+pnpm build        # production build
+pnpm lint         # ESLint
+pnpm typecheck    # tsc --noEmit
+
+# Supabase
+supabase start
+supabase db reset
+supabase gen types typescript --local > lib/db/types.ts
+```
+
+## Architecture Notes
+
+- **Request flow:** client POSTs to `/api/generate` → proxy refreshes Supabase session → route handler authenticates user, checks rate limit, selects system prompt by mode, calls `streamText`, persists output on stream finish via `onFinish`, returns a text stream response consumed by `useCompletion`.
+- **Caching:** history list is cached with `"use cache"` + `cacheTag` and invalidated via `revalidateTag` after each new generation.
+- **Proxy:** `proxy.ts` (not `middleware.ts`) handles session refresh on every request at the Edge — no DB or AI calls inside it.
+- **RLS:** every user-owned table has row-level security scoped to `auth.uid()`.

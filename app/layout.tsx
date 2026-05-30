@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Writing Tool",
-  description: "Paste text, pick a mode, and get an AI-rewritten version.",
+  title: "Polish Writing",
+  description: "AI-powered writing assistant. Rewrite and polish your text, then review your generation history.",
 };
 
 export default function RootLayout({

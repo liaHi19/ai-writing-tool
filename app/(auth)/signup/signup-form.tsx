@@ -27,7 +27,7 @@ export default function SignupForm() {
   const form = useForm<SignUpInput>({
     resolver: standardSchemaResolver(signUpSchema),
     defaultValues: authDefaults,
-    mode: "onTouched",
+    mode: "onBlur",
   });
   const [state, formAction, pending] = useActionState<SignUpState, FormData>(
     signUp,
@@ -49,6 +49,8 @@ export default function SignupForm() {
       </div>
     );
   }
+
+  const isSubmitDisabled = pending || !form.formState.isDirty || !form.formState.isValid;
 
   const onValid = (data: SignUpInput) => {
     const fd = new FormData();
@@ -92,7 +94,11 @@ export default function SignupForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isSubmitDisabled}
+        >
           {pending ? "Creating account…" : "Create account"}
         </Button>
       </form>

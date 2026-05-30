@@ -27,7 +27,7 @@ export default function LoginForm() {
   const form = useForm<SignInInput>({
     resolver: standardSchemaResolver(signInSchema),
     defaultValues: authDefaults,
-    mode: "onTouched",
+    mode: "onBlur",
   });
 
   const [state, formAction, pending] = useActionState<SignInState, FormData>(
@@ -38,6 +38,8 @@ export default function LoginForm() {
   useEffect(() => {
     if (state?.error) toast.error(state.error);
   }, [state]);
+
+  const isSubmitDisabled = pending || !form.formState.isDirty || !form.formState.isValid;
 
   const onValid = (data: SignInInput) => {
     const fd = new FormData();
@@ -81,7 +83,11 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isSubmitDisabled}
+        >
           {pending ? "Signing in…" : "Sign in"}
         </Button>
       </form>
