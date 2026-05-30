@@ -82,7 +82,7 @@ export function HistoryToolbar({
         }
         icon={<Trash2 size={20} />}
         title="Delete all generations?"
-        description="This can't be undone."
+        description="The entire history will be deleted"
         onConfirm={handleClearAll}
         confirmLabel="Delete all"
       />
