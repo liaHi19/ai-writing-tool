@@ -5,7 +5,9 @@ import { refresh, updateTag } from "next/cache";
 import { MODEL_ID } from "@/lib/anthropic";
 import { getAuthenticatedUser } from "@/lib/supabase/server";
 import {
+  deleteGenerationSchema,
   saveGenerationSchema,
+  updateGenerationSchema,
   type SaveGenerationInput,
 } from "@/lib/validation/generate";
 
@@ -57,17 +59,28 @@ export type DeleteGenerationResult =
 export async function deleteGeneration(
   id: string,
 ): Promise<DeleteGenerationResult> {
+  const parsed = deleteGenerationSchema.safeParse({ id });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Invalid request",
+    };
+  }
+
   const { supabase, user } = await getAuthenticatedUser();
   if (!user) return { ok: false, error: "Unauthorized" };
 
   const { data, error } = await supabase
     .from("generations")
     .delete()
-    .eq("id", id)
+    .eq("id", parsed.data.id)
     .eq("user_id", user.id)
     .select("id");
 
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    console.error("Failed to delete generation:", error);
+    return { ok: false, error: "Failed to delete" };
+  }
   if (!data || data.length === 0) return { ok: false, error: "Not found" };
 
   updateTag(`history:${user.id}`);
@@ -83,19 +96,28 @@ export async function updateGeneration(
   id: string,
   output: string,
 ): Promise<UpdateGenerationResult> {
-  if (!output.trim()) return { ok: false, error: "Output cannot be empty" };
+  const parsed = updateGenerationSchema.safeParse({ id, output });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Invalid request",
+    };
+  }
 
   const { supabase, user } = await getAuthenticatedUser();
   if (!user) return { ok: false, error: "Unauthorized" };
 
   const { data, error } = await supabase
     .from("generations")
-    .update({ output })
-    .eq("id", id)
+    .update({ output: parsed.data.output })
+    .eq("id", parsed.data.id)
     .eq("user_id", user.id)
     .select("id");
 
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    console.error("Failed to update generation:", error);
+    return { ok: false, error: "Failed to save" };
+  }
   if (!data || data.length === 0) return { ok: false, error: "Not found" };
 
   updateTag(`history:${user.id}`);
@@ -117,7 +139,10 @@ export async function clearAllGenerations(): Promise<ClearAllGenerationsResult> 
     .eq("user_id", user.id)
     .select("id");
 
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    console.error("Failed to clear generations:", error);
+    return { ok: false, error: "Failed to clear" };
+  }
 
   updateTag(`history:${user.id}`);
   refresh();

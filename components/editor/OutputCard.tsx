@@ -1,18 +1,18 @@
 "use client";
 
+import { Check, Loader2, Pencil, Save, X } from "lucide-react";
 import { useState } from "react";
-import { Check, Loader2, Pencil, Save } from "lucide-react";
-import { toast } from "sonner";
 import { useWatch, type Control } from "react-hook-form";
+import { toast } from "sonner";
 
 import { saveGeneration } from "@/actions/generations";
+import { CopyButton } from "@/components/editor/CopyButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { CopyButton } from "@/components/editor/CopyButton";
 import { MODE_META } from "@/lib/constants";
 import { countChars, countWords } from "@/lib/helpers";
-import { cn } from "@/lib/utils";
 import { type Mode } from "@/lib/prompts";
+import { cn } from "@/lib/utils";
 import { type GenerateInput } from "@/lib/validation/generate";
 
 interface OutputCardProps {
@@ -75,6 +75,16 @@ export function OutputCard({
     }
   }
 
+  function handleEditToggle() {
+    if (isEditing) {
+      // Cancel: discard edits and return to the original output
+      setEditedOutput(null);
+      setIsEditing(false);
+    } else {
+      setIsEditing(true);
+    }
+  }
+
   const canEdit = !!completion && !isLoading;
   const saveDisabled = !displayedText || isLoading || saving || saved;
 
@@ -83,26 +93,26 @@ export function OutputCard({
       {/* Card head — "Output · {mode}" label + Copy/Save actions; stacks on mobile */}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="font-mono text-[11px] uppercase tracking-widest text-(--fg-muted)">
-          {isEditing ? "Editing · " : "Output · "}{modeName}
+          {isEditing ? "Editing · " : "Output · "}
+          {modeName}
         </span>
         <div className="flex items-center gap-1.5">
-          {canEdit && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "flex-1 rounded-full px-4 sm:flex-none",
-                isEditing && "bg-(--fg)/8",
-              )}
-              aria-pressed={isEditing}
-              aria-label={isEditing ? "Done editing" : "Edit output"}
-              onClick={() => setIsEditing((prev) => !prev)}
-            >
-              <Pencil />
-              {isEditing ? "Done" : "Edit"}
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "flex-1 rounded-full px-4 sm:flex-none",
+              isEditing && "bg-(--fg)/8",
+            )}
+            aria-pressed={isEditing}
+            aria-label={isEditing ? "Cancel editing" : "Edit output"}
+            disabled={!canEdit}
+            onClick={handleEditToggle}
+          >
+            {isEditing ? <X /> : <Pencil />}
+            {isEditing ? "Cancel" : "Edit"}
+          </Button>
           <CopyButton
             text={displayedText}
             className="flex-1 rounded-full px-4 sm:flex-none"
@@ -163,7 +173,6 @@ export function OutputCard({
         </div>
       )}
 
-      {/* Foot — chars/words left, mode · auto right */}
       <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] uppercase tracking-[0.04em] text-(--fg-dim)">
         <span>{isEmpty ? "—" : `${chars} chars · ${words} words`}</span>
         <span>{mode} · auto</span>

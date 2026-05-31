@@ -21,3 +21,16 @@ export const saveGenerationSchema = z.object({
 });
 
 export type SaveGenerationInput = z.infer<typeof saveGenerationSchema>;
+
+export const deleteGenerationSchema = z.object({
+  id: z.uuid("Invalid generation id"),
+});
+
+export type DeleteGenerationInput = z.infer<typeof deleteGenerationSchema>;
+
+export const updateGenerationSchema = z.object({
+  id: z.uuid("Invalid generation id"),
+  output: z.string().trim().min(1, "Output is required").max(16_000),
+});
+
+export type UpdateGenerationInput = z.infer<typeof updateGenerationSchema>;
