@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7" fill="#161a1f" />
+  <text
+    x="50%"
+    y="51%"
+    dy="0.04em"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-family="ui-monospace, 'Geist Mono', 'SFMono-Regular', Menlo, Consolas, monospace"
+    font-size="19"
+    font-weight="500"
+    letter-spacing="-0.4"
+    fill="#eef1f4"
+  >P</text>
+</svg>
